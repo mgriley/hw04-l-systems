@@ -43,10 +43,13 @@ void main()
     mat4 rotate = rotation_matrix(vs_Rotate.xyz, vs_Rotate.w);
     mat4 scale = scale_matrix(vs_Scale);
     mat4 translate = translate_matrix(vs_Translate);
-    vec4 pos = translate * rotate * scale * vec4(vs_Pos);
+    mat4 instance_trans = translate * rotate * scale;
+    vec4 pos = instance_trans * vec4(vs_Pos);
+    // TODO - use inv transpose if nonuniform scales
+    vec4 nor = instance_trans * vec4(vs_Nor);
 
     fs_Col = vs_Col;
     fs_Pos = pos;
-    fs_Nor = normalize(vs_Nor.xyz);
+    fs_Nor = normalize(nor.xyz);
     gl_Position = u_ViewProj * pos;
 }

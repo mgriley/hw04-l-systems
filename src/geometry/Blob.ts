@@ -44,6 +44,7 @@ function generate_mesh(samples_x, samples_y, attr_func): any {
       vec3.subtract(ca, c, a);
       vec3.normalize(ca, ca);
       vec3.cross(res, ba, ca);
+      vec3.negate(res, res);
       vec3.normalize(res, res);
 
       normals.push(res);
