@@ -63,7 +63,7 @@ function create_ground() {
     1,1,1,
   ]);
   let colors = new Float32Array([
-    0,1,0,1,
+    0.5,0.1,0,1,
   ]);
   seg.setInstanceVBOs(offsets, rotations, scales, colors);
   seg.setNumInstances(1);
@@ -174,11 +174,11 @@ function draw_instance(instance_data, turtle) {
 
 function run_system() {
   let gen_str = 'b';
-  let num_iterations = 3;
+  let num_iterations = 10;
 
   let expansion_rules = {
     'b': create_rule([function() {
-      return 'dtb'
+      return 'dtsb'
     }], [1]),
   };
   let draw_rules = {
@@ -189,7 +189,10 @@ function run_system() {
       state.turtle = state.turtle_stack.pop();
     }),
     't': det_rule(function(state) {
-      vec3.add(state.turtle.position, state.turtle.position, v3(0,1,0));
+      vec3.add(state.turtle.position, state.turtle.position, v3(0,2,0));
+    }),
+    's': det_rule(function(state) {
+      vec3.scale(state.turtle.scale, state.turtle.scale, 1.2);
     }),
     'd': create_rule([function(state) {
       draw_instance(
