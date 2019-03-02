@@ -50,7 +50,7 @@ function gen_ground(x, y): any {
 
 function create_ground() {
   let res = generate_mesh(2, 2, gen_ground);
-  let seg = new Blob(...res);
+  let seg = new Blob(res[0],res[1],res[2]);
   seg.create();
 
   let offsets = new Float32Array([
@@ -72,7 +72,7 @@ function create_ground() {
 
 function create_seg() {
   let sphere_res = generate_mesh(10, 10, gen_sphere);
-  let seg = new Blob(...sphere_res);
+  let seg = new Blob(sphere_res[0], sphere_res[1], sphere_res[2]);
   seg.create();
 
   let offsets = new Float32Array([
@@ -250,12 +250,12 @@ function run_system() {
   // extract the drawables from the draw state
 
   let sphere_res = generate_mesh(40, 40, gen_torus);
-  let seg = new Blob(...sphere_res);
+  let seg = new Blob(sphere_res[0], sphere_res[1], sphere_res[2]);
   seg.create();
   setup_instances(seg, instances.segments);
 
   let leaf_res = generate_mesh(4, 4, gen_sphere);
-  let leaf = new Blob(...leaf_res);
+  let leaf = new Blob(leaf_res[0], leaf_res[1], leaf_res[2]);
   leaf.create();
   setup_instances(leaf, instances.leaves);
 
