@@ -6,25 +6,46 @@ function v3(x, y, z) {
   return vec3.fromValues(x, y, z);
 }
 
+function v3e() {
+  return v3(0,0,0);
+}
+
 function v4(x, y, z, w) {
   return vec4.fromValues(x, y, z, w);
 }
 
-function gen_circle(x, y): any  {
+function gen_sphere(x, y): any  {
   let v_angle = y * Math.PI;    
   let h_angle = x * 2.0 * Math.PI;
-  return [
+  let pos = v3(
     Math.sin(v_angle) * Math.cos(h_angle),
     Math.sin(v_angle) * Math.sin(h_angle),
-    Math.cos(v_angle)]
+    Math.cos(v_angle));
+  let nor = vec3.clone(pos);
+  return [pos, nor];
+}
+
+function gen_torus(nx, ny): any {
+  let theta = nx * 2 * Math.PI;
+  let phi = ny * 2 * Math.PI;
+  let ring_pos = v3(Math.cos(theta), 0, Math.sin(theta));
+  let inner_r = 0.2;
+  let pos = vec3.add(v3e(),
+    vec3.scale(v3e(), vec3.negate(v3e(), ring_pos), inner_r*Math.cos(phi)),
+    vec3.scale(v3e(), v3(0,1,0), inner_r*Math.sin(phi)));
+  vec3.add(pos, pos, ring_pos);
+  let nor = vec3.subtract(v3e(), pos, ring_pos);
+  return [pos, nor];
 }
 
 function gen_ground(x, y): any {
-  return [
+  let pos = v3(
     (x - 0.5) * 20.0,
     0,
     (y - 0.5) * 20.0
-  ]
+  );
+  let nor = v3(0,1,0);
+  return [pos, nor];
 }
 
 function create_ground() {
@@ -50,8 +71,8 @@ function create_ground() {
 }
 
 function create_seg() {
-  let circle_res = generate_mesh(10, 10, gen_circle);
-  let seg = new Blob(...circle_res);
+  let sphere_res = generate_mesh(10, 10, gen_sphere);
+  let seg = new Blob(...sphere_res);
   seg.create();
 
   let offsets = new Float32Array([
@@ -168,7 +189,7 @@ function run_system() {
       state.turtle = state.turtle_stack.pop();
     }),
     't': det_rule(function(state) {
-      vec3.add(state.turtle.position, state.turtle.position, v3(0,4,0));
+      vec3.add(state.turtle.position, state.turtle.position, v3(0,1,0));
     }),
     'd': create_rule([function(state) {
       draw_instance(
@@ -225,12 +246,12 @@ function run_system() {
 
   // extract the drawables from the draw state
 
-  let circle_res = generate_mesh(10, 10, gen_circle);
-  let seg = new Blob(...circle_res);
+  let sphere_res = generate_mesh(40, 40, gen_torus);
+  let seg = new Blob(...sphere_res);
   seg.create();
   setup_instances(seg, instances.segments);
 
-  let leaf_res = generate_mesh(4, 4, gen_circle);
+  let leaf_res = generate_mesh(4, 4, gen_sphere);
   let leaf = new Blob(...leaf_res);
   leaf.create();
   setup_instances(leaf, instances.leaves);

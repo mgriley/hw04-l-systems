@@ -13,8 +13,9 @@ function generate_mesh(samples_x, samples_y, attr_func): any {
 
   for (let y = 0; y < samples_y; ++y) {
     for (let x = 0; x < samples_x; ++x) {
-      let pos = attr_func(x / (samples_x - 1), y / (samples_y - 1));  
+      let [pos, normal] = attr_func(x / (samples_x - 1), y / (samples_y - 1));  
       positions.push(pos);
+      normals.push(normal);
 
       // indices for a completed patch
       if (x > 0 && y > 0) {
@@ -26,7 +27,8 @@ function generate_mesh(samples_x, samples_y, attr_func): any {
       }
     }
   }
-  // normals
+  // normals (eh, too toublesome to generate like this)
+  /*
   for (let y = 0; y < samples_y; ++y) {
     for (let x = 0; x < samples_x; ++x) {
       let pa = positions[idx(x, y)];
@@ -50,6 +52,7 @@ function generate_mesh(samples_x, samples_y, attr_func): any {
       normals.push(res);
     }
   }
+  */
   return [indices, positions, normals]
 }
 
@@ -80,7 +83,11 @@ class Blob extends Drawable {
 
     let [indices, positions, normals] = [this.gen_indices, this.gen_positions, this.gen_normals];
     positions = positions.map(p => [p[0], p[1], p[2], 1.0]);
-    normals = normals.map(n => [n[0], n[1], n[2], 0.0]);
+    normals = normals.map(function(n) {
+      let v = vec3.fromValues(n[0],n[1],n[2]);
+      vec3.normalize(v, v);
+      return [v[0], v[1], v[2], 0.0];
+    });
 
     this.indices = new Uint32Array(indices);
     this.positions = new Float32Array(positions.flat());
